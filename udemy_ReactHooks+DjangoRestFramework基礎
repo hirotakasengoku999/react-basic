@@ -233,3 +233,9 @@
 	7.postsのtitleを表示
 		{posts.title}
 	8.useEffectの第二引数にclickedを割り当てる（クリックしたときのみ実行したいから）
+セクション 19 useContextコンセプト
+	■PropsDrilling問題
+		propsは1階層ごとにしか移動できない 【A】→【B】→【C】
+		useContextを使うと階層をジャンプできる 【A】→【C】
+	■useReducer + useContext = Reduxに近い機能
+
