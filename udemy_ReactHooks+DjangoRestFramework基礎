@@ -1,0 +1,235 @@
+セクション３ React開発環境
+	1.nodejsのインストール
+		インストール出来たかの確認
+			コマンドプロンプトで
+			node -v
+			npm -v
+			↑バージョンが表示されたらOK
+	2.Reactのプロジェクトを作成
+		コマンドプロンプトで
+		npx create-react-app フォルダ名
+	3.プロジェクトrun
+		2のフォルダに移動
+		コマンドプロンプト npm start
+
+セクション 4 double rendering
+	次のセクションの修正（バージョンの違いによる）
+
+セクション 5 プロジェクトフォルダー構造
+	1.public/index.htmlが一番上の階層で大元（これを表示）
+	2.public/index.htmlのid="root"のdivタグとsrc/index.jsの変数rootが紐づいている
+	3.src/index.jsの<App />がsrc/App.jsのApp関数と紐づいている
+	4.メインの開発はApp.js、App.css、component
+
+セクション 6 Functional コンポーネント
+	1.React Hooksはclassコンポーネントを使わない（基本Functionalコンポーネント）
+	2.vscodeにコード補完してくれる「ES7 React/Redux/GrapQL/React-Nat..」をインストール
+	3.src/componentsフォルダ作成
+	4.src/components/Basic1.jsを作成
+	5."rafce"と打つとReact Allow Functional componentの雛型が出来る
+	6.Basic1をApp.jsから読み込む
+		・import Basic1 from './components/Basic1'
+		・任意の場所に<Basic1>と埋め込む
+
+セクション 7 Props
+	Props:親コンポーネントから子コンポーネントへ値を渡す仕組み
+	例）App.js から Basic1 に Hooksという値を渡す
+	■App.js
+		<Basic1 name="Hooks"/>
+	■Basic1.js
+		const Basic1 = (props) => {
+			return (
+				<div>
+					{props.name}
+				</div>
+			)
+		}
+
+セクション 8 イベントハンドラー
+	イベントハンドラー:ボタンをクリックした時などに呼び出される関数の仕組み
+	使用例）
+	1.関数を定義
+		const clickHandler = () => {
+			処理内容
+		};
+	2.呼び出し
+		<button onClick={clickHandler}>Click</button>
+
+セクション 9 React Hooksの凄さ
+	1.Version16.8(2019)から導入された新機能
+	2.Class Componentを使わない → コードがシンプルになった
+		昔は
+			・Functional Componentはpropsで渡された値を更新（状態管理）出来ない
+			・propsで渡された値を更新（状態管理）するならClass Componentを使っていた（this.props this.stateとか）
+		今は（Hooksは）
+			・Functional Componentでもpropsの値を更新（状態管理）出来るようになった
+				useState(Hooks)を使う
+				これによりコードがシンプルになった
+			・もうClass Componentを使わなくていい
+	3.Props Drilling問題解決
+		今までは1つの階層ごとにしかPropsで値を渡せなかった
+			【A】→【B】→【C】
+		Hooksの"useContext"を使うととばして値を渡せる
+			【A】→【C】
+	4.Redux(状態管理)の使用を最小限に
+		useContext + useReducerを使う（これでも解決出来なかったらReduxに手を出す）
+
+セクション 10 useState基礎１
+	1.インポート
+		import React, {useState} from 'react';
+	2.stateとstateを変更するための変数を定義
+		const [count, setCount] = useState(0);
+			countがstateの変数名
+			setCountがstateを変更するための変数
+			useState(0)のゼロは初期値
+	3.2を使う
+		countを変更（更新）
+			onClick={()=>setCount(count+1)}
+		使用例
+			<button onClick={()=>setCount(count+1)}>{count}</button>
+	Functional Componentのみで完結している
+
+セクション 11 useState基礎2
+	1.状態変更する処理は複数かける
+		onclick = { ()=> {setCount(処理１); setCount(処理２);} }
+		※アロー関数の中にカーリーブラケットで囲んで複数の処理をかく
+	2.複数の処理を書くときは前回値から更新出来るように書く
+		■setCountの引数には
+			①直接設定したい値を渡す
+				setCount(count+1)
+			②関数を渡してその返り値を設定値にする
+				setCount(prevCount=>prevCount+1)
+				※prevCountという変数名は何でもいい
+	3.データベース等の値を更新するためにuseStateで値を変更する
+
+セクション 12 UseState(Object)
+	※Object: pythonでいうdictのこと
+	1.定義 objectに対してstate管理
+		const[product, setProduct] = useState({name:"", price:""});
+	2.formから入力した値でstateを更新
+		<input value={product.name} onChange={evt=>setProduct({})} />
+		evt(任意の変数名)はイベントハンドラの情報を受け取る
+			使用例）evt.target.valueでinputの入力値を受け取る
+		setProduct({...product, name:evt.target.value})
+			↑【重要】「...」を付ける事で、オブジェクトの中身を要素ごとに分解！
+			　ターゲット要素のみを更新する
+	3.state表示
+		<h3>name: {product.name}</h3>
+		<h3>price: {product.price}</h3>
+
+セクション 13 UseState(配列)
+	1.定義 配列に対してstate管理
+		const [products, setProducts] = useState([])
+	2.ボタンをクリックしたら+1カウントされるイベントハンドラ作成
+		onClick={newProducts}
+	3.新しい要素を追加する関数(newProducts)作成
+		const newProducts = ()=> {
+			setProducts([...products, {
+				id: products.length,
+				name: "Hello React"
+			}])
+		}
+	4.配列の要素を表示
+		<ul>
+			{products.map(product => (
+				<li key={product.id}>id: {product.id) name: {product.name}</li>
+					)
+				)
+			};
+		</ul>
+
+セクション 14 UseEffect
+	useEffectを使うとき
+		・componentが初めて読み込まれた時だけ実行したい（最初のページ読み込み時だけデータを取得するなど）
+		・あるstateが変化した時だけ実行したい
+	1. インポート
+		import React, {useEffect} from 'react'
+
+	2. useEffect使用
+		■レンダリング毎に実行（ボタンをクリックしただけで毎回実行されてしまう）
+			useEffect(() => {console.log("invoked")});
+		■初めてページを読み込んだ時のみ実行（第二引数に"[]"を追加）
+			useEffect(() => {console.log("invoked")}, []);
+
+セクション 15 UseEffect(条件付きレンダリング)
+	特定のstateのみ実行したい場合、第二引数に反応させたいstateを追加する
+	useEffect(()=>{ 処理 }, [反応させたいstate])
+
+セクション 16 UseEffect(cleanup)
+	componentが破棄されたときの処理
+	タイマーを作り、SwitchボタンをクリックしたらTimerComponentをcleanupする例
+	書き方
+		useEffect(()=>{
+			return () => {
+				cleanup //ここに破棄された時の処理をかく
+			}
+		})	
+	1.2つComponentを追加
+		TimerContainer.js
+		Timer.js
+		AppからTimerContainerを呼び出し、TimerContainerからTimerを呼び出す
+	2.TimerContainer作成
+		1.display stateを定義
+			const [display, setDisplay] = useState(true)
+		2.ボタンを作成してonClickイベントハンドラ作成
+			onClick={()=>setDisplay(!display)}
+	3.Timer作成
+		1.count state定義
+			const [count, setCount] = useState(0);
+		2.1秒ごとにcountが+1されるtime関数を定義
+			const time = () => {
+				setCount(prevCount=>prevCount+1)
+			};
+		3.useEffect作成（最初のみ実行したいので第二引数に[]追加）
+			useEffect(() => {}, [])
+		4.useEffect内に1秒ごとにtime関数が実行されるよう記述
+			useEffect(() => {const interval = setInteravl(time, 1000)}, [])
+		5.useEffect内にcleanup記述
+			useEffect(() => {
+				const interval = setInterval(time, 1000)
+				return () => {
+					clearInterval(interval);
+				} //return()=>{処理}と書くとcomponentが破棄されたときに処理が実行される
+			}, [])
+
+セクション 17 APIデータ取得(axios + fetch)
+	バックエンドのApiにreact側からアクセスし、データの取得や更新をする
+	方法は、
+		・axios (サードバーティ)
+		・fetch (javascriptのメソッド)
+	がある。
+	1.components/ApiFetch.js作成
+	2.npm install axiosでaxiosをインストール
+	3.ApiFetch編集
+		1.取得データを格納するstate定義
+			const [posts, setPosts] = useState([]) //初期値は空の配列
+		2.useEffect定義 ※この中にデータ取得の処理を記述していく
+			useEffect(() => { 
+				axios.get(' url ')
+				.then(res => {setPosts(res.date)}) //.thenでgetで取得した値を受け取り、resに入れアロー関数に渡す
+			}, []); //初回のみ実行させるため第二引数に[]を追加
+		3.取得データ表示 ulタグとliタグ使用
+			<ul>
+				{ post.map(post => <li key={post.id}>{post.title}</li>) }
+			</ul>
+	4.AppからApiFetchを読み込む
+	8.Fetchメソッドの場合
+		fetch('url', {method: 'GET'})
+		.then(res=>res.json) //fetchは取得データがhtmlなためjsonに変換
+		.then(data=>{setPosts(data)}) //jsonに変換されたものを変数dataに格納し、アロー関数とsetPostsでデータをpostに入れる
+
+セクション 18 APIデータ取得(axios + fetch):id
+	idを指定して取得する
+	1.stateの定義
+		const [id, setId] = useState(1)
+		const [clicked, setClicked] = useState(false)
+	2.url指定の最後にidを動的に追加
+		`ULR/${id}`
+	3.取得するデータはひとつなのでulタグをコメントアウト
+	5.idを入力するform作成
+		value={id} onChange={evt=>setId(evt.target.value)}
+	6.state「click」を反転させる関数
+		handlerClicked = () => { setClicked(!cliked) }
+	7.postsのtitleを表示
+		{posts.title}
+	8.useEffectの第二引数にclickedを割り当てる（クリックしたときのみ実行したいから）
